@@ -20,8 +20,8 @@ puppeteer._update = function () {
         eval(`puppeteer.animations.${animMethod}(elem)`);
         elem.visible = true;
       }
-    } else if (rect.bottom > window.innerHeight) {
-      // elem.visible = false;
+    } else if (puppeteer._scrollUp && rect.top > window.innerHeight) {
+      elem.visible = false;
     }
   });
 
@@ -48,13 +48,17 @@ puppeteer._update = function () {
 
 puppeteer._updateHeader = function () {
   var elem = document.getElementById('header');
-  
-  if (puppeteer._windowOffset > 1700) {
-    setInterval(function() {
-      elem.classList.remove('header');
-    }, 0);
 
-    elem.classList.add('header2');
+  if (puppeteer._windowOffset > 500) {
+    if (elem.classList.contains('header')) {
+      elem.classList.remove('header');
+      elem.classList.add('header2');
+    }
+  } else {
+    if (elem.classList.contains('header2')) {
+      elem.classList.remove('header2');
+      elem.classList.add('header');
+    }
   }
 }
 
@@ -113,10 +117,10 @@ puppeteer.animations.vertical = function (elem) {
 
   elem.animate([{
     transform: `translateY(${param}px)`
-  },
-  {
+  }, {
     transform: 'translateY(0px)'
   }], {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
@@ -137,7 +141,7 @@ puppeteer.animations.blur = function (elem) {
   }
 
   if (isNaN(param)) {
-    param = 0;
+    param = 5;
   }
 
   if (param < 0) {
@@ -149,6 +153,7 @@ puppeteer.animations.blur = function (elem) {
   }, {
     filter: 'blur(0px)',
   }], {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
@@ -165,7 +170,7 @@ puppeteer.animations.fade = function (elem) {
   }
 
   if (isNaN(duration)) {
-    duration = 1500;
+    duration = 500;
   }
 
   if (isNaN(param)) {
@@ -177,10 +182,12 @@ puppeteer.animations.fade = function (elem) {
   }
 
   elem.animate([{
-    opacity: `grayscale(${param})`
+    opacity: param
   }, {
     opacity: 1
-  }], {
+  }],
+    {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
@@ -213,6 +220,7 @@ puppeteer.animations.colorize = function (elem) {
   }, {
     filter: 'grayscale(0)'
   }], {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
@@ -242,6 +250,7 @@ puppeteer.animations.horizontal = function (elem) {
   {
     transform: 'translateX(0px)'
   }], {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
@@ -265,12 +274,16 @@ puppeteer.animations.rotate = function (elem) {
     param = 15;
   }
 
+  var offset = delay / (delay + duration);
+
   elem.animate([{
     transform: `rotate(${param}deg)`
   },
   {
     transform: 'rotate(0deg)'
-  }], {
+  }],
+    {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
@@ -300,6 +313,7 @@ puppeteer.animations.scale = function (elem) {
   {
     transform: 'scale(1)'
   }], {
+      fill: 'both',
       delay: delay,
       duration: duration
     }
